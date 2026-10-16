@@ -129,7 +129,7 @@ async def leer_servidor_opc(url: str):
 def ejecutar_logica_proceso():
     data = st.session_state.estado_ptap
 
-    # 1. EVALUACIÓN PRIORITARIA DE FALLAS (Aplica aun si está en Modo Manual o Automático)
+    # 1. EVALUACIÓN PRIORITARIA DE FALLAS
     if data["falla_bomba_cruda"]:
         data["bomba_cruda"] = False
         data["caudal_entrada"] = 0.0
@@ -149,9 +149,7 @@ def ejecutar_logica_proceso():
     else:
         data["bomba_distribucion"] = True
         if not st.session_state.modo_manual:
-            # Si hay agua en T5 y B04 funciona, hay salida independientemente de la entrada
             data["caudal_salida"] = round(random.uniform(110.0, 120.0), 1)
-            # Descuento paulatino del tanque T5 si no entra agua
             if data["falla_bomba_cruda"] and data["nivel_t5"] > 5.0:
                 data["nivel_t5"] = round(data["nivel_t5"] - 2.5, 2)
 
@@ -449,6 +447,37 @@ with st.expander("🔍 Mapeo de Diagnóstico OPC UA / IEC 62541"):
             "Origen": st_estado["origen_datos"]
         })
     st.dataframe(pd.DataFrame(diag_data), use_container_width=True)
+
+
+# ==========================================
+# WIDGET DE HORA Y FECHA (FIJADO INFERIOR DERECHA)
+# ==========================================
+ahora = datetime.datetime.now()
+fecha_actual = ahora.strftime("%Y-%m-%d")
+hora_actual = ahora.strftime("%H:%M:%S")
+
+st.markdown(
+    f"""
+    <div style="
+        position: fixed; 
+        bottom: 15px; 
+        right: 15px; 
+        background-color: white; 
+        padding: 10px 20px; 
+        border-radius: 8px; 
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2); 
+        z-index: 1000; 
+        font-family: sans-serif; 
+        font-size: 16px; 
+        font-weight: bold; 
+        color: #333;
+        border-left: 5px solid #0288d1;
+    ">
+        📅 {fecha_actual} &nbsp;|&nbsp; ⏱️ {hora_actual}
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
 time.sleep(2)
 st.rerun()
