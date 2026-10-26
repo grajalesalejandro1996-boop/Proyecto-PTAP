@@ -481,9 +481,6 @@ st.markdown(
 
 time.sleep(2)
 st.rerun()
-gggggd
-f
-fr
 
 fr
 
